@@ -36,12 +36,7 @@ module.exports = {
     }
 
     const user = await User.find({_id:decodedToken.userId}).select("email role id urlId")
-    if(user[0].role == "95792003873"){
-        userRole = await PatientModel.findOne({user: decodedToken.userId})
-       
-    }else if (user[0].role == "67418256321"){
-        userRole = await DoctorModel.findOne({user: decodedToken.userId})
-    }
+
 
     const data = {
         email: user[0].email,
