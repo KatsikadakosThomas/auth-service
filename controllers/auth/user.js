@@ -261,13 +261,6 @@ module.exports = {
         email,
       });
 
-      if (user.role == "95792003873") {
-        userRole = await PatientModel.findOne({ user: user._id });
-        console.log(userRole._id.toString());
-      } else if (user.role == "67418256321") {
-        userRole = await DoctorModel.findOne({ user: user._id });
-      }
-
       if (user.approved === false)
         return res.status(400).send({ message: "not activated" });
 
@@ -275,14 +268,13 @@ module.exports = {
         //Check if passwords matches
         bcrypt.compare(password, user.password, function (err, hash) {
           if (hash) {
-            if (user.role !== "noRole") {
+         
               const token = jwt.sign(
                 {
                   email: user?.email,
                   userId: user?._id.toString(),
                   role: user?.role,
                   urlId: user?.urlId,
-                  userRoleID: userRole._id ? userRole?._id?.toString() : "",
                 },
                 process.env.TOKEN
               );
@@ -301,38 +293,8 @@ module.exports = {
               );
               return res.json({
                 data: { token },
-                success: "withRole",
               });
-            } else {
-              const token = jwt.sign(
-                {
-                  email: user.email,
-                  userId: user._id.toString(),
-                  role: "noRole",
-                  urlId: user.urlId,
-                },
-                process.env.TOKEN
-              );
-
-              console.log(token);
-
-              res.setHeader(
-                "Set-Cookie",
-                cookie.serialize("token", token, {
-                  // ...(process.env.NODE_ENV === 'production' && { domain: 'jobeat.gr' }),
-                  domain: `localhost`,
-                  httpOnly: false,
-                  secure: false,
-                  sameSite: "lax",
-                  maxAge: 172800,
-                  path: "/",
-                })
-              );
-              return res.json({
-                data: { token },
-                success: "noRole",
-              });
-            }
+     
           } else if (err) {
             console.log(err);
           } else {
